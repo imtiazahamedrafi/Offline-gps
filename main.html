@@ -1,0 +1,75 @@
+<html>
+<head>
+  <title>GPS Auto Update Offline</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+      background: #f4f4f4;
+    }
+    #data {
+      margin-top: 20px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Offline Live GPS Location</h1>
+  <marquee>Developed By GBR</marquee>
+  <button onclick="startTracking()">Start Tracking</button>
+
+  <div id="data">
+    <p>Latitude: <span id="lat">-</span></p>
+    <p>Longitude: <span id="lon">-</span></p>
+    <p>Accuracy: <span id="acc">-</span> meters</p>
+    <p>Altitude: <span id="alt">-</span></p>
+    <p>Speed: <span id="spd">-</span> m/s</p>
+    <p>Timestamp: <span id="time">-</span></p>
+  </div>
+
+  <script>
+    let watchId = null;
+
+    function updatePosition(pos) {
+      const coords = pos.coords;
+      document.getElementById("lat").textContent = coords.latitude;
+      document.getElementById("lon").textContent = coords.longitude;
+      document.getElementById("acc").textContent = coords.accuracy;
+      document.getElementById("alt").textContent = coords.altitude ?? "N/A";
+      document.getElementById("spd").textContent = coords.speed ?? "N/A";
+      document.getElementById("time").textContent = new Date(pos.timestamp).toLocaleString();
+    }
+
+    function startTracking() {
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by this browser.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          updatePosition(pos);
+          watchId = navigator.geolocation.watchPosition(
+            updatePosition,
+            (err) => alert("Error: " + err.message),
+            { enableHighAccuracy: true, maximumAge: 0 }
+          );
+        },
+        (err) => alert("Error: " + err.message),
+        { enableHighAccuracy: true }
+      );
+    }
+  </script>
+</body>
+</html>
